@@ -1,0 +1,8 @@
+[slapd]
+enabled = true
+port = 389,636
+filter = slapd
+logpath = /var/log/ldap.log
+maxretry = 5
+bantime = 3600
+findtime = 600

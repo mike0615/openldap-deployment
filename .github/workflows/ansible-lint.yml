@@ -1,0 +1,31 @@
+name: Ansible Lint and Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ansible-lint:
+    name: Ansible Syntax and Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible and Ansible-Lint
+        run: |
+          sudo apt update
+          sudo apt install -y ansible ansible-lint
+
+      - name: Run Ansible Syntax Check
+        run: |
+          ansible-playbook --syntax-check ansible/playbook.yml
+
+      - name: Run Ansible Lint
+        run: |
+          ansible-lint ansible/playbook.yml

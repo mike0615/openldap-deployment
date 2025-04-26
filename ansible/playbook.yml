@@ -1,0 +1,50 @@
+- name: Full OpenLDAP Deployment
+  hosts: all
+  become: yes
+
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Install OpenLDAP and migration tools
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - openldap-servers
+        - openldap-clients
+        - migrationtools
+        - fail2ban
+
+    - name: Enable slapd service
+      systemd:
+        name: slapd
+        enabled: true
+        state: started
+
+    - name: Deploy configuration scripts
+      copy:
+        src: ../scripts/
+        dest: /usr/local/sbin/
+        mode: '0755'
+        remote_src: no
+
+    - name: Deploy configuration files
+      copy:
+        src: ../configs/
+        dest: /usr/local/sbin/
+        mode: '0644'
+        remote_src: no
+
+    - name: Execute full deployment
+      command: bash /usr/local/sbin/full_deployment.sh
+      args:
+        chdir: /usr/local/sbin/
+
+    - name: Ensure backup cronjob is installed
+      cron:
+        name: "LDAP Daily Backup"
+        minute: "0"
+        hour: "2"
+        user: root
+        job: "/usr/local/sbin/ldap_backup.sh"

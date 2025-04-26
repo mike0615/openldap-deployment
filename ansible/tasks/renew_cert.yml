@@ -1,0 +1,3 @@
+---
+- name: Renew LDAP SSL Certificate
+  command: bash /usr/local/sbin/renew_ldap_cert.sh

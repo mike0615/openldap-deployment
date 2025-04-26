@@ -1,0 +1,22 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "up{job='ldap'}",
+          "legendFormat": "LDAP Server",
+          "refId": "A"
+        }
+      ],
+      "title": "LDAP Server Up Status",
+      "type": "graph"
+    }
+  ],
+  "title": "OpenLDAP Monitoring",
+  "timezone": "browser",
+  "version": 1
+}

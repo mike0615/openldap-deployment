@@ -1,0 +1,5 @@
+---
+ldap_admin_dn: "cn=admin,dc=sys"
+ldap_password: "your_admin_password"
+ldap_base_dn: "dc=sys"
+backup_retention_days: 30

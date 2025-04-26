@@ -1,0 +1,54 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "title": "LDAP Bind Success Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(rate(openldap_bind_success_total[5m]))",
+          "legendFormat": "Successful Binds",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "LDAP Bind Failure Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(rate(openldap_bind_failure_total[5m]))",
+          "legendFormat": "Failed Binds",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "LDAP Total Connections",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "sum(rate(openldap_connections_total[5m]))",
+          "legendFormat": "Connections",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "title": "LDAP Server Uptime",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "up{job='ldap'}",
+          "legendFormat": "Server Up",
+          "refId": "D"
+        }
+      ]
+    }
+  ],
+  "title": "LDAP Authentication Monitoring",
+  "timezone": "browser",
+  "version": 1
+}

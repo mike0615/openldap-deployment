@@ -1,0 +1,71 @@
+---
+- name: Install OpenLDAP packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - openldap-servers
+    - openldap-clients
+    - migrationtools
+    - fail2ban
+
+- name: Enable slapd service
+  systemd:
+    name: slapd
+    enabled: true
+    state: started
+
+- name: Deploy certificate generation script
+  copy:
+    src: generate_ldap_certs.sh
+    dest: /usr/local/sbin/generate_ldap_certs.sh
+    mode: '0755'
+
+- name: Generate SSL certificates
+  command: bash /usr/local/sbin/generate_ldap_certs.sh
+
+- name: Apply TLS configuration
+  copy:
+    src: configure_tls.ldif
+    dest: /tmp/configure_tls.ldif
+
+- name: Apply Replication configuration
+  copy:
+    src: setup_replication.ldif
+    dest: /tmp/setup_replication.ldif
+
+- name: Configure LDAP TLS
+  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_tls.ldif
+
+- name: Configure LDAP replication
+  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/setup_replication.ldif
+
+- name: Setup Fail2Ban LDAP protection
+  copy:
+    src: slapd.conf
+    dest: /etc/fail2ban/filter.d/slapd.conf
+
+- name: Setup Fail2Ban jail
+  copy:
+    src: slapd.local
+    dest: /etc/fail2ban/jail.d/slapd.local
+
+- name: Start Fail2Ban service
+  systemd:
+    name: fail2ban
+    enabled: true
+    state: started
+
+- name: Deploy backup script
+  template:
+    src: ldap_backup.sh.j2
+    dest: /usr/local/sbin/ldap_backup.sh
+    mode: '0755'
+
+- name: Setup cron job for backups
+  cron:
+    name: "LDAP Daily Backup"
+    minute: "0"
+    hour: "2"
+    user: root
+    job: "/usr/local/sbin/ldap_backup.sh"

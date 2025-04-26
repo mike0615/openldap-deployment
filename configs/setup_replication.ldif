@@ -1,0 +1,14 @@
+dn: cn=config
+changetype: modify
+add: olcServerID
+olcServerID: 1 ldap://ldap1.sys
+
+dn: cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=001 provider=ldap://ldap2.sys binddn="cn=admin,dc=sys" bindmethod=simple credentials=your_password searchbase="dc=sys" type=refreshAndPersist retry="5 5 300 +" timeout=1
+
+dn: cn=config
+changetype: modify
+add: olcMirrorMode
+olcMirrorMode: TRUE
