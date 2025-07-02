@@ -1,0 +1,30 @@
+---
+- name: Install and configure FreeIPA Server on Rocky Linux 9.6
+  hosts: freeipa_servers
+  become: yes
+
+  tasks:
+    - name: Install FreeIPA packages
+      dnf:
+        name:
+          - ipa-server
+          - ipa-server-dns
+        state: present
+
+    - name: Run FreeIPA server install
+      command: ipa-server-install --setup-dns --allow-zone-overlap --no-forwarders --auto-reverse --no-ntp -n example.local -r EXAMPLE.LOCAL -p Passw0rd123 -a Passw0rd123 -U
+      args:
+        creates: /etc/ipa/default.conf
+
+    - name: Open FreeIPA firewall ports
+      firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        state: enabled
+      loop:
+        - freeipa-ldap
+        - freeipa-ldaps
+        - freeipa-replication
+
+    - name: Reload firewalld
+      command: firewall-cmd --reload

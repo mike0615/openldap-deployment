@@ -1,50 +1,34 @@
-# OpenLDAP Deployment Kit
+# FreeIPA Enterprise LDAP Deployment on Rocky Linux 9.6
 
-[![Build](https://img.shields.io/github/actions/workflow/status/YOUR-USERNAME/openldap-deployment/ansible-lint.yml?label=Build&style=flat-square)](https://github.com/YOUR-USERNAME/openldap-deployment/actions)
-[![License](https://img.shields.io/github/license/YOUR-USERNAME/openldap-deployment?style=flat-square)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-available-brightgreen?style=flat-square)](https://YOUR-USERNAME.github.io/openldap-deployment/)
-[![Platform](https://img.shields.io/badge/platform-Linux-blue?style=flat-square)](#)
+## Step 1: Prepare Rocky Linux 9.6 Minimal Installation
+- Install Rocky Linux 9.6 Minimal on the target server.
+- Configure a static IP address and hostname (e.g., ipa-server.example.local).
 
----
-
-## Overview
-This repository automates the deployment, security, backup, replication, and monitoring of a production-grade OpenLDAP server environment.
-
----
-
-## Features
-- ✅ Secure TLS/SSL configuration with self-signed or Let's Encrypt certificates
-- ✅ Daily automatic backups of LDAP database
-- ✅ Fail2Ban brute-force protection for LDAP
-- ✅ Multi-master replication ready
-- ✅ Grafana dashboards and Prometheus metrics for real-time monitoring
-- ✅ GitHub Actions CI/CD for Ansible Playbook validation
-- ✅ Full GitHub Pages Documentation site
-
----
-
-## Quick Start
-
-### Deploy OpenLDAP
+## Step 2: Install FreeIPA Server
 ```bash
-ansible-playbook -i ansible/inventory ansible/playbook.yml
+sudo dnf install -y ipa-server ipa-server-dns
 ```
 
-### Renew TLS Certificates
+## Step 3: Run FreeIPA Installation
 ```bash
-ansible-playbook -i ansible/inventory ansible/tasks/renew_cert.yml
+sudo ipa-server-install --setup-dns --allow-zone-overlap --no-forwarders --auto-reverse --no-ntp -n example.local -r EXAMPLE.LOCAL -p Passw0rd123 -a Passw0rd123 -U
 ```
 
----
+## Step 4: Allow Firewall Ports
+```bash
+sudo firewall-cmd --permanent --add-service=freeipa-ldap
+sudo firewall-cmd --permanent --add-service=freeipa-ldaps
+sudo firewall-cmd --permanent --add-service=freeipa-replication
+sudo firewall-cmd --reload
+```
 
-## Documentation
-- 📖 [Deployment Guide](docs/deployment.md)
-- 📖 [Monitoring Guide](docs/monitoring.md)
-- 📖 [Usage Guide](docs/usage.md)
+## Step 5: Verify FreeIPA Services
+```bash
+sudo ipa-healthcheck
+sudo ipa user-find
+```
 
----
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
+## Step 6: Access FreeIPA Web UI
+- URL: https://ipa-server.example.local
+- Login: admin
+- Password: Passw0rd123
